@@ -73,11 +73,16 @@ class DragulaService {
       sourceModel.splice(dragIndex, 1)
       drake.cancel(true)
       const removeSource = {
+        vm: sourceModelContainer.vm,
+        ondragdrop: sourceModelContainer.ondragdrop,
         el: source,
+        dragIndex: dragIndex,
         model: sourceModel,
         expression: sourceModelContainer.expression
       }
-      this.eventBus.$emit('remove-model', name, el, removeSource, dragIndex)
+      this.eventBus.$emit('remove-model', name, el, removeSource, dragIndex);
+      if (removeSource.ondragdrop)
+        removeSource.ondragdrop(removeSource);
     })
     drake.on('drag', (el, source) => {
       dragElm = el
@@ -91,7 +96,10 @@ class DragulaService {
       const sourceModelContainer = this.findModelContainerByContainer(source, drake)
       sourceModel = sourceModelContainer.model
       const dropSource = {
+        vm: sourceModelContainer.vm,
+        ondragdrop: sourceModelContainer.ondragdrop,
         el: source,
+        dragIndex: dragIndex,
         model: sourceModel,
         expression: sourceModelContainer.expression
       }
@@ -119,13 +127,22 @@ class DragulaService {
         Array.prototype.splice.call(targetModel, dropIndex, 0, dropElmModel)
 
         dropTarget = {
+          vm: targetModelContainer.vm,
+          ondragdrop: targetModelContainer.ondragdrop,
           el: target,
+          dropIndex: dropIndex,
           model: targetModel,
           expression: targetModelContainer.expression
         }
       }
       drake.cancel(true)
+      dropTarget.source = dropSource
+      dropSource.target = dropTarget
       this.eventBus.$emit('drop-model', name, dropElm, dropTarget, dropSource, dropIndex)
+      if (dropSource.ondragdrop)
+        dropSource.ondragdrop(dropSource);
+      if (dropSource !== dropTarget && dropTarget.ondragdrop)
+        dropTarget.ondragdrop(dropTarget);
     })
     drake.registered = true
   }

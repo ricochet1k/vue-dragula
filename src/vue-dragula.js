@@ -33,6 +33,8 @@ export default function (Vue) {
           drake.models = []
         }
         drake.models.push({
+          vm: vnode.context,
+          ondragdrop: vnode.data && vnode.data.on && vnode.data.on.dragdrop,
           model: binding.value.slice(),
           container: container,
           expression: binding.expression
@@ -49,6 +51,8 @@ export default function (Vue) {
         return
       }
       drake.models = [{
+        vm: vnode.context,
+        ondragdrop: vnode.data && vnode.data.on && vnode.data.on.dragdrop,
         model: binding.value.slice(),
         container: container,
         expression: binding.expression
@@ -73,6 +77,8 @@ export default function (Vue) {
         modelContainer.model = newValue.slice()
       } else {
         drake.models.push({
+          vm: vnode.context,
+          ondragdrop: vnode.data && vnode.data.on && vnode.data.on.dragdrop,
           model: newValue.slice(),
           container: container,
           expression: binding.expression
