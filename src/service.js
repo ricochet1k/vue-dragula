@@ -60,10 +60,21 @@ class DragulaService {
       return
     }
     let dragElm
+    let dragData
     let dragIndex
     let dropIndex
+    let sourceModelContainer
     let sourceModel
     let targetModel
+    function clear() {
+      dragElm = null
+      dragData = null
+      dragIndex = null
+      dropIndex = null
+      sourceModelContainer = null
+      sourceModel = null
+      targetModel = null
+    }
     drake.on('remove', (el, container, source) => {
       if (!drake.models) {
         return
@@ -77,24 +88,27 @@ class DragulaService {
         ondragdrop: sourceModelContainer.ondragdrop,
         el: source,
         dragIndex: dragIndex,
+        removed: dragData,
         model: sourceModel,
         expression: sourceModelContainer.expression
       }
       this.eventBus.$emit('remove-model', name, el, removeSource, dragIndex);
       if (removeSource.ondragdrop)
         removeSource.ondragdrop(removeSource);
+      clear();
     })
     drake.on('drag', (el, source) => {
       dragElm = el
       dragIndex = this.domIndexOf(el, source)
+      sourceModelContainer = this.findModelContainerByContainer(source, drake)
+      sourceModel = sourceModelContainer.model
+      dragData = sourceModel[dragIndex]
     })
     drake.on('drop', (dropElm, target, source) => {
       if (!drake.models || !target) {
         return
       }
       dropIndex = this.domIndexOf(dropElm, target)
-      const sourceModelContainer = this.findModelContainerByContainer(source, drake)
-      sourceModel = sourceModelContainer.model
       const dropSource = {
         vm: sourceModelContainer.vm,
         ondragdrop: sourceModelContainer.ondragdrop,
@@ -143,6 +157,7 @@ class DragulaService {
         dropSource.ondragdrop(dropSource);
       if (dropSource !== dropTarget && dropTarget.ondragdrop)
         dropTarget.ondragdrop(dropTarget);
+      clear();
     })
     drake.registered = true
   }

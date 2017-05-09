@@ -1266,10 +1266,21 @@ var DragulaService = function () {
         return;
       }
       var dragElm = void 0;
+      var dragData = void 0;
       var dragIndex = void 0;
       var dropIndex = void 0;
+      var sourceModelContainer = void 0;
       var sourceModel = void 0;
       var targetModel = void 0;
+      function clear() {
+        dragElm = null;
+        dragData = null;
+        dragIndex = null;
+        dropIndex = null;
+        sourceModelContainer = null;
+        sourceModel = null;
+        targetModel = null;
+      }
       drake.on('remove', function (el, container, source) {
         if (!drake.models) {
           return;
@@ -1283,23 +1294,26 @@ var DragulaService = function () {
           ondragdrop: sourceModelContainer.ondragdrop,
           el: source,
           dragIndex: dragIndex,
+          removed: dragData,
           model: sourceModel,
           expression: sourceModelContainer.expression
         };
         _this2.eventBus.$emit('remove-model', name, el, removeSource, dragIndex);
         if (removeSource.ondragdrop) removeSource.ondragdrop(removeSource);
+        clear();
       });
       drake.on('drag', function (el, source) {
         dragElm = el;
         dragIndex = _this2.domIndexOf(el, source);
+        sourceModelContainer = _this2.findModelContainerByContainer(source, drake);
+        sourceModel = sourceModelContainer.model;
+        dragData = sourceModel[dragIndex];
       });
       drake.on('drop', function (dropElm, target, source) {
         if (!drake.models || !target) {
           return;
         }
         dropIndex = _this2.domIndexOf(dropElm, target);
-        var sourceModelContainer = _this2.findModelContainerByContainer(source, drake);
-        sourceModel = sourceModelContainer.model;
         var dropSource = {
           vm: sourceModelContainer.vm,
           ondragdrop: sourceModelContainer.ondragdrop,
@@ -1340,6 +1354,7 @@ var DragulaService = function () {
         _this2.eventBus.$emit('drop-model', name, dropElm, dropTarget, dropSource, dropIndex);
         if (dropSource.ondragdrop) dropSource.ondragdrop(dropSource);
         if (dropSource !== dropTarget && dropTarget.ondragdrop) dropTarget.ondragdrop(dropTarget);
+        clear();
       });
       drake.registered = true;
     }
