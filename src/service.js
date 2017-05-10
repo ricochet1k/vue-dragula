@@ -85,7 +85,7 @@ class DragulaService {
       drake.cancel(true)
       const removeSource = {
         vm: sourceModelContainer.vm,
-        ondragdrop: sourceModelContainer.ondragdrop,
+        handlers: sourceModelContainer.handlers,
         el: source,
         dragIndex: dragIndex,
         removed: dragData,
@@ -93,8 +93,8 @@ class DragulaService {
         expression: sourceModelContainer.expression
       }
       this.eventBus.$emit('remove-model', name, el, removeSource, dragIndex);
-      if (removeSource.ondragdrop)
-        removeSource.ondragdrop(removeSource);
+      if (removeSource.handlers.dragdrop)
+        removeSource.handlers.dragdrop(removeSource);
       clear();
     })
     drake.on('drag', (el, source) => {
@@ -103,6 +103,9 @@ class DragulaService {
       sourceModelContainer = this.findModelContainerByContainer(source, drake)
       sourceModel = sourceModelContainer.model
       dragData = sourceModel[dragIndex]
+
+      if (sourceModelContainer.handlers['dg-drag'])
+        sourceModelContainer.handlers['dg-drag']({el, source, dragIndex});
     })
     drake.on('drop', (dropElm, target, source) => {
       if (!drake.models || !target) {
@@ -111,7 +114,7 @@ class DragulaService {
       dropIndex = this.domIndexOf(dropElm, target)
       const dropSource = {
         vm: sourceModelContainer.vm,
-        ondragdrop: sourceModelContainer.ondragdrop,
+        handlers: sourceModelContainer.handlers,
         el: source,
         dragIndex: dragIndex,
         model: sourceModel,
@@ -142,7 +145,7 @@ class DragulaService {
 
         dropTarget = {
           vm: targetModelContainer.vm,
-          ondragdrop: targetModelContainer.ondragdrop,
+          handlers: targetModelContainer.handlers,
           el: target,
           dropIndex: dropIndex,
           model: targetModel,
@@ -153,10 +156,10 @@ class DragulaService {
       dropTarget.source = dropSource
       dropSource.target = dropTarget
       this.eventBus.$emit('drop-model', name, dropElm, dropTarget, dropSource, dropIndex)
-      if (dropSource.ondragdrop)
-        dropSource.ondragdrop(dropSource);
-      if (dropSource !== dropTarget && dropTarget.ondragdrop)
-        dropTarget.ondragdrop(dropTarget);
+      if (dropSource.handlers.dragdrop)
+        dropSource.handlers.dragdrop(dropSource);
+      if (dropSource !== dropTarget && dropTarget.handlers.dragdrop)
+        dropTarget.handlers.dragdrop(dropTarget);
       clear();
     })
     drake.registered = true

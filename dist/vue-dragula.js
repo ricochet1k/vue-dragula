@@ -1291,7 +1291,7 @@ var DragulaService = function () {
         drake.cancel(true);
         var removeSource = {
           vm: sourceModelContainer.vm,
-          ondragdrop: sourceModelContainer.ondragdrop,
+          handlers: sourceModelContainer.handlers,
           el: source,
           dragIndex: dragIndex,
           removed: dragData,
@@ -1299,7 +1299,7 @@ var DragulaService = function () {
           expression: sourceModelContainer.expression
         };
         _this2.eventBus.$emit('remove-model', name, el, removeSource, dragIndex);
-        if (removeSource.ondragdrop) removeSource.ondragdrop(removeSource);
+        if (removeSource.handlers.dragdrop) removeSource.handlers.dragdrop(removeSource);
         clear();
       });
       drake.on('drag', function (el, source) {
@@ -1308,6 +1308,8 @@ var DragulaService = function () {
         sourceModelContainer = _this2.findModelContainerByContainer(source, drake);
         sourceModel = sourceModelContainer.model;
         dragData = sourceModel[dragIndex];
+
+        if (sourceModelContainer.handlers['dg-drag']) sourceModelContainer.handlers['dg-drag']({ el: el, source: source, dragIndex: dragIndex });
       });
       drake.on('drop', function (dropElm, target, source) {
         if (!drake.models || !target) {
@@ -1316,7 +1318,7 @@ var DragulaService = function () {
         dropIndex = _this2.domIndexOf(dropElm, target);
         var dropSource = {
           vm: sourceModelContainer.vm,
-          ondragdrop: sourceModelContainer.ondragdrop,
+          handlers: sourceModelContainer.handlers,
           el: source,
           dragIndex: dragIndex,
           model: sourceModel,
@@ -1341,7 +1343,7 @@ var DragulaService = function () {
 
           dropTarget = {
             vm: targetModelContainer.vm,
-            ondragdrop: targetModelContainer.ondragdrop,
+            handlers: targetModelContainer.handlers,
             el: target,
             dropIndex: dropIndex,
             model: targetModel,
@@ -1352,8 +1354,8 @@ var DragulaService = function () {
         dropTarget.source = dropSource;
         dropSource.target = dropTarget;
         _this2.eventBus.$emit('drop-model', name, dropElm, dropTarget, dropSource, dropIndex);
-        if (dropSource.ondragdrop) dropSource.ondragdrop(dropSource);
-        if (dropSource !== dropTarget && dropTarget.ondragdrop) dropTarget.ondragdrop(dropTarget);
+        if (dropSource.handlers.dragdrop) dropSource.handlers.dragdrop(dropSource);
+        if (dropSource !== dropTarget && dropTarget.handlers.dragdrop) dropTarget.handlers.dragdrop(dropTarget);
         clear();
       });
       drake.registered = true;
@@ -1443,7 +1445,7 @@ function VueDragula (Vue) {
         }
         drake.models.push({
           vm: vnode.context,
-          ondragdrop: vnode.data && vnode.data.on && vnode.data.on.dragdrop,
+          handlers: vnode.data && vnode.data.on || {},
           model: binding.value.slice(),
           container: container,
           expression: binding.expression
@@ -1461,7 +1463,7 @@ function VueDragula (Vue) {
       }
       drake.models = [{
         vm: vnode.context,
-        ondragdrop: vnode.data && vnode.data.on && vnode.data.on.dragdrop,
+        handlers: vnode.data && vnode.data.on || {},
         model: binding.value.slice(),
         container: container,
         expression: binding.expression
@@ -1490,7 +1492,7 @@ function VueDragula (Vue) {
       } else {
         drake.models.push({
           vm: vnode.context,
-          ondragdrop: vnode.data && vnode.data.on && vnode.data.on.dragdrop,
+          handlers: vnode.data && vnode.data.on || {},
           model: newValue.slice(),
           container: container,
           expression: binding.expression

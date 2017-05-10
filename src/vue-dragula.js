@@ -34,7 +34,7 @@ export default function (Vue) {
         }
         drake.models.push({
           vm: vnode.context,
-          ondragdrop: vnode.data && vnode.data.on && vnode.data.on.dragdrop,
+          handlers: vnode.data && vnode.data.on || {},
           model: binding.value.slice(),
           container: container,
           expression: binding.expression
@@ -52,7 +52,7 @@ export default function (Vue) {
       }
       drake.models = [{
         vm: vnode.context,
-        ondragdrop: vnode.data && vnode.data.on && vnode.data.on.dragdrop,
+        handlers: vnode.data && vnode.data.on || {},
         model: binding.value.slice(),
         container: container,
         expression: binding.expression
@@ -78,7 +78,7 @@ export default function (Vue) {
       } else {
         drake.models.push({
           vm: vnode.context,
-          ondragdrop: vnode.data && vnode.data.on && vnode.data.on.dragdrop,
+          handlers: vnode.data && vnode.data.on || {},
           model: newValue.slice(),
           container: container,
           expression: binding.expression
