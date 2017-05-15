@@ -24,6 +24,8 @@ export default function (Vue) {
 
     bind (el, binding, vnode) {
       const {container, name} = getBindInfo.call(this, isVue2, el, vnode)
+      if (!Array.isArray(binding.value))
+        console.error('expected binding value of array', binding);
       let drake = service.getDrake(name)
       if (drake) {
         drake.containers.push(container)
@@ -95,9 +97,9 @@ export default function (Vue) {
       if (containerIndex > -1) {
         drake.containers.splice(containerIndex, 1)
       }
-      if (drake.containers.length === 0) {
-        service.destroy(name)
-      }
+      // if (drake.containers.length === 0) {
+      //   service.destroy(name)
+      // }
     }
 
   })

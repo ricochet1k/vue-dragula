@@ -1432,6 +1432,7 @@ function VueDragula (Vue) {
           container = _getBindInfo$call.container,
           name = _getBindInfo$call.name;
 
+      if (!Array.isArray(binding.value)) console.error('expected binding value of array', binding);
       var drake = service.getDrake(name);
       if (drake) {
         drake.containers.push(container);
@@ -1512,9 +1513,9 @@ function VueDragula (Vue) {
       if (containerIndex > -1) {
         drake.containers.splice(containerIndex, 1);
       }
-      if (drake.containers.length === 0) {
-        service.destroy(name);
-      }
+      // if (drake.containers.length === 0) {
+      //   service.destroy(name)
+      // }
     }
   });
 }
